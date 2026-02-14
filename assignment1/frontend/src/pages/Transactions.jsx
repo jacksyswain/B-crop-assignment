@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "../components/ui/Table";
 import { Card, CardHeader, CardContent } from "../components/ui/Card";
+import TransactionModal from "../components/TransactionModal";
 
 export default function Transactions() {
   const [transactions, setTransactions] = useState([]);
@@ -19,6 +20,9 @@ export default function Transactions() {
   const [pages, setPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editData, setEditData] = useState(null);
 
   const fetchData = async () => {
     try {
@@ -42,96 +46,153 @@ export default function Transactions() {
     fetchData();
   }, [page, search]);
 
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this transaction?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      await API.delete(`/transactions/${id}`);
+      fetchData();
+    } catch (err) {
+      alert("Delete failed");
+    }
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <h2 className="text-lg font-semibold">
-            Transaction Explorer
-          </h2>
+    <>
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-semibold">
+              Transaction Explorer
+            </h2>
 
-          <Input
-            placeholder="Search transactions..."
-            value={search}
-            onChange={(e) => {
-              setPage(1);
-              setSearch(e.target.value);
-            }}
-            className="w-64"
-          />
-        </div>
-      </CardHeader>
-
-      <CardContent>
-
-        {loading && (
-          <p className="text-sm text-slate-500 mb-4">
-            Loading transactions...
-          </p>
-        )}
-
-        {error && (
-          <p className="text-red-500 text-sm mb-4">
-            {error}
-          </p>
-        )}
-
-        {!loading && transactions.length === 0 && (
-          <p className="text-slate-500 text-sm mb-4">
-            No transactions found.
-          </p>
-        )}
-
-        {transactions.length > 0 && (
-          <>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Amount</TableCell>
-                  <TableCell>Category</TableCell>
-                  <TableCell>Date</TableCell>
-                </TableRow>
-              </TableHead>
-
-              <TableBody>
-                {transactions.map((t) => (
-                  <TableRow key={t._id}>
-                    <TableCell>{t.title}</TableCell>
-                    <TableCell>₹ {t.amount}</TableCell>
-                    <TableCell>{t.category}</TableCell>
-                    <TableCell>
-                      {new Date(t.date).toLocaleDateString()}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-
-            {/* Pagination */}
-            <div className="flex justify-end gap-2 mt-6">
-              <Button
-                onClick={() => setPage((p) => p - 1)}
-                disabled={page === 1}
-              >
-                Prev
-              </Button>
-
-              <span className="flex items-center text-sm px-2">
-                Page {page} of {pages}
-              </span>
+            <div className="flex gap-3">
+              <Input
+                placeholder="Search transactions..."
+                value={search}
+                onChange={(e) => {
+                  setPage(1);
+                  setSearch(e.target.value);
+                }}
+                className="w-64"
+              />
 
               <Button
-                onClick={() => setPage((p) => p + 1)}
-                disabled={page === pages}
+                onClick={() => {
+                  setEditData(null);
+                  setIsModalOpen(true);
+                }}
               >
-                Next
+                + Add
               </Button>
             </div>
-          </>
-        )}
+          </div>
+        </CardHeader>
 
-      </CardContent>
-    </Card>
+        <CardContent>
+
+          {loading && (
+            <p className="text-sm text-slate-500 mb-4">
+              Loading transactions...
+            </p>
+          )}
+
+          {error && (
+            <p className="text-red-500 text-sm mb-4">
+              {error}
+            </p>
+          )}
+
+          {!loading && transactions.length === 0 && (
+            <p className="text-slate-500 text-sm mb-4">
+              No transactions found.
+            </p>
+          )}
+
+          {transactions.length > 0 && (
+            <>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Title</TableCell>
+                    <TableCell>Amount</TableCell>
+                    <TableCell>Category</TableCell>
+                    <TableCell>Date</TableCell>
+                    <TableCell>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+
+                <TableBody>
+                  {transactions.map((t) => (
+                    <TableRow key={t._id}>
+                      <TableCell>{t.title}</TableCell>
+                      <TableCell>₹ {t.amount}</TableCell>
+                      <TableCell>{t.category}</TableCell>
+                      <TableCell>
+                        {new Date(t.date).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button
+                            className="text-xs"
+                            onClick={() => {
+                              setEditData(t);
+                              setIsModalOpen(true);
+                            }}
+                          >
+                            Edit
+                          </Button>
+
+                          <Button
+                            className="text-xs bg-red-500 hover:bg-red-600"
+                            onClick={() => handleDelete(t._id)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+
+              {/* Pagination */}
+              <div className="flex justify-end gap-2 mt-6">
+                <Button
+                  onClick={() => setPage((p) => p - 1)}
+                  disabled={page === 1}
+                >
+                  Prev
+                </Button>
+
+                <span className="flex items-center text-sm px-2">
+                  Page {page} of {pages}
+                </span>
+
+                <Button
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={page === pages}
+                >
+                  Next
+                </Button>
+              </div>
+            </>
+          )}
+
+        </CardContent>
+      </Card>
+
+      {/* Add / Edit Modal */}
+      <TransactionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        editData={editData}
+        onSuccess={fetchData}
+      />
+    </>
   );
 }
