@@ -1,5 +1,6 @@
 const Transaction = require("../models/Transaction");
 const buildQuery = require("../utils/buildQuery");
+const mongoose = require("mongoose");
 
 const createTransaction = async (data, userId) => {
   return await Transaction.create({ ...data, user: userId });
@@ -16,7 +17,7 @@ const updateTransaction = async (id, data, userId) => {
 const deleteTransaction = async (id, userId) => {
   return await Transaction.findOneAndDelete({
     _id: id,
-    user: userId,
+    user: new mongoose.Types.ObjectId(userId)
   });
 };
 

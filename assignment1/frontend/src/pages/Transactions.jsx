@@ -72,129 +72,151 @@ export default function Transactions() {
   };
 
   return (
-    <>
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col gap-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold">
+  <>
+    <Card className="bg-white shadow-sm rounded-2xl border border-slate-200">
+      <CardHeader className="border-b bg-slate-50 rounded-t-2xl">
+        <div className="flex flex-col gap-6">
+
+          {/* Top Row */}
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-semibold text-slate-800">
                 Transaction Explorer
               </h2>
-
-              <div className="flex gap-3">
-                <Input
-                  placeholder="Search..."
-                  value={search}
-                  onChange={(e) => {
-                    setPage(1);
-                    setSearch(e.target.value);
-                  }}
-                  className="w-64"
-                />
-
-                <Button
-                  onClick={() => {
-                    setEditData(null);
-                    setIsModalOpen(true);
-                  }}
-                >
-                  + Add
-                </Button>
-              </div>
+              <p className="text-sm text-slate-500">
+                Manage and filter your transactions
+              </p>
             </div>
 
-            {/* Filters */}
-            <div className="grid grid-cols-5 gap-3">
+            <div className="flex gap-3 items-center">
               <Input
-                placeholder="Category"
-                value={filters.category}
-                onChange={(e) =>
-                  setFilters({ ...filters, category: e.target.value })
-                }
+                placeholder="Search transactions..."
+                value={search}
+                onChange={(e) => {
+                  setPage(1);
+                  setSearch(e.target.value);
+                }}
+                className="w-72 bg-white"
               />
 
-              <Input
-                type="number"
-                placeholder="Min Amount"
-                value={filters.minAmount}
-                onChange={(e) =>
-                  setFilters({ ...filters, minAmount: e.target.value })
-                }
-              />
-
-              <Input
-                type="number"
-                placeholder="Max Amount"
-                value={filters.maxAmount}
-                onChange={(e) =>
-                  setFilters({ ...filters, maxAmount: e.target.value })
-                }
-              />
-
-              <Input
-                type="date"
-                value={filters.startDate}
-                onChange={(e) =>
-                  setFilters({ ...filters, startDate: e.target.value })
-                }
-              />
-
-              <Input
-                type="date"
-                value={filters.endDate}
-                onChange={(e) =>
-                  setFilters({ ...filters, endDate: e.target.value })
-                }
-              />
+              <Button
+                className="bg-slate-900 hover:bg-slate-800"
+                onClick={() => {
+                  setEditData(null);
+                  setIsModalOpen(true);
+                }}
+              >
+                + Add Transaction
+              </Button>
             </div>
           </div>
-        </CardHeader>
 
-        <CardContent>
-          {loading && (
-            <p className="text-sm text-slate-500">
-              Loading transactions...
-            </p>
-          )}
+          {/* Filters */}
+          <div className="grid grid-cols-5 gap-4">
+            <Input
+              placeholder="Category"
+              value={filters.category}
+              onChange={(e) =>
+                setFilters({ ...filters, category: e.target.value })
+              }
+            />
 
-          {error && (
-            <p className="text-red-500 text-sm">
-              {error}
-            </p>
-          )}
+            <Input
+              type="number"
+              placeholder="Min Amount"
+              value={filters.minAmount}
+              onChange={(e) =>
+                setFilters({ ...filters, minAmount: e.target.value })
+              }
+            />
 
-          {!loading && transactions.length === 0 && (
-            <p className="text-slate-500 text-sm">
-              No transactions found.
-            </p>
-          )}
+            <Input
+              type="number"
+              placeholder="Max Amount"
+              value={filters.maxAmount}
+              onChange={(e) =>
+                setFilters({ ...filters, maxAmount: e.target.value })
+              }
+            />
 
-          {transactions.length > 0 && (
-            <>
+            <Input
+              type="date"
+              value={filters.startDate}
+              onChange={(e) =>
+                setFilters({ ...filters, startDate: e.target.value })
+              }
+            />
+
+            <Input
+              type="date"
+              value={filters.endDate}
+              onChange={(e) =>
+                setFilters({ ...filters, endDate: e.target.value })
+              }
+            />
+          </div>
+
+        </div>
+      </CardHeader>
+
+      <CardContent className="p-6">
+
+        {loading && (
+          <div className="text-center py-10 text-slate-500">
+            Loading transactions...
+          </div>
+        )}
+
+        {error && (
+          <div className="text-center py-6 text-red-500">
+            {error}
+          </div>
+        )}
+
+        {!loading && transactions.length === 0 && (
+          <div className="text-center py-12 text-slate-500">
+            No transactions found.
+          </div>
+        )}
+
+        {transactions.length > 0 && (
+          <>
+            <div className="overflow-hidden rounded-xl border border-slate-200">
               <Table>
                 <TableHead>
-                  <TableRow>
-                    <TableCell>Title</TableCell>
-                    <TableCell>Amount</TableCell>
-                    <TableCell>Category</TableCell>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Actions</TableCell>
+                  <TableRow className="bg-slate-50 text-slate-600 text-sm">
+                    <TableCell className="font-medium">Title</TableCell>
+                    <TableCell className="font-medium">Amount</TableCell>
+                    <TableCell className="font-medium">Category</TableCell>
+                    <TableCell className="font-medium">Date</TableCell>
+                    <TableCell className="font-medium text-right">
+                      Actions
+                    </TableCell>
                   </TableRow>
                 </TableHead>
 
                 <TableBody>
                   {transactions.map((t) => (
-                    <TableRow key={t._id}>
-                      <TableCell>{t.title}</TableCell>
-                      <TableCell>₹ {t.amount}</TableCell>
-                      <TableCell>{t.category}</TableCell>
-                      <TableCell>
+                    <TableRow
+                      key={t._id}
+                      className="hover:bg-slate-50 transition"
+                    >
+                      <TableCell className="font-medium text-slate-800">
+                        {t.title}
+                      </TableCell>
+                      <TableCell className="text-slate-700">
+                        ₹ {t.amount}
+                      </TableCell>
+                      <TableCell className="text-slate-600">
+                        {t.category}
+                      </TableCell>
+                      <TableCell className="text-slate-500">
                         {new Date(t.date).toLocaleDateString()}
                       </TableCell>
                       <TableCell>
-                        <div className="flex gap-2">
+                        <div className="flex justify-end gap-2">
                           <Button
-                            className="text-xs"
+                            className="text-xs bg-slate-100 text-slate-700 hover:bg-slate-200"
                             onClick={() => {
                               setEditData(t);
                               setIsModalOpen(true);
@@ -204,7 +226,7 @@ export default function Transactions() {
                           </Button>
 
                           <Button
-                            className="text-xs bg-red-500 hover:bg-red-600"
+                            className="text-xs bg-red-500 hover:bg-red-600 text-white"
                             onClick={() => handleDelete(t._id)}
                             disabled={deletingId === t._id}
                           >
@@ -218,37 +240,42 @@ export default function Transactions() {
                   ))}
                 </TableBody>
               </Table>
+            </div>
 
-              <div className="flex justify-end gap-2 mt-6">
-                <Button
-                  onClick={() => setPage((p) => p - 1)}
-                  disabled={page === 1}
-                >
-                  Prev
-                </Button>
+            {/* Pagination */}
+            <div className="flex justify-end items-center gap-3 mt-6">
+              <Button
+                className="bg-slate-100 text-slate-700 hover:bg-slate-200"
+                onClick={() => setPage((p) => p - 1)}
+                disabled={page === 1}
+              >
+                Prev
+              </Button>
 
-                <span className="flex items-center text-sm px-2">
-                  Page {page} of {pages}
-                </span>
+              <span className="text-sm text-slate-600">
+                Page {page} of {pages}
+              </span>
 
-                <Button
-                  onClick={() => setPage((p) => p + 1)}
-                  disabled={page === pages}
-                >
-                  Next
-                </Button>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
+              <Button
+                className="bg-slate-100 text-slate-700 hover:bg-slate-200"
+                onClick={() => setPage((p) => p + 1)}
+                disabled={page === pages}
+              >
+                Next
+              </Button>
+            </div>
+          </>
+        )}
+      </CardContent>
+    </Card>
 
-      <TransactionModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        editData={editData}
-        onSuccess={fetchData}
-      />
-    </>
-  );
+    <TransactionModal
+      isOpen={isModalOpen}
+      onClose={() => setIsModalOpen(false)}
+      editData={editData}
+      onSuccess={fetchData}
+    />
+  </>
+);
+
 }

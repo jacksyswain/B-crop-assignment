@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Transaction = require("../models/Transaction");
 const response = require("../utils/responseFormatter");
 
@@ -5,9 +6,11 @@ const getDashboard = async (req, res, next) => {
   try {
     const userId = req.user;
 
+    const objectUserId = new mongoose.Types.ObjectId(userId);
+
     // Total Expense
     const totalAgg = await Transaction.aggregate([
-      { $match: { user: userId } },
+      { $match: { user: objectUserId } },
       {
         $group: {
           _id: null,
@@ -20,7 +23,7 @@ const getDashboard = async (req, res, next) => {
 
     // Category Breakdown
     const categoryBreakdown = await Transaction.aggregate([
-      { $match: { user: userId } },
+      { $match: { user: objectUserId } },
       {
         $group: {
           _id: "$category",
@@ -30,7 +33,7 @@ const getDashboard = async (req, res, next) => {
     ]);
 
     // Recent Transactions
-    const recent = await Transaction.find({ user: userId })
+    const recent = await Transaction.find({ user: objectUserId })
       .sort({ createdAt: -1 })
       .limit(5);
 
