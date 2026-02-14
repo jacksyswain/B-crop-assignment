@@ -51,75 +51,122 @@ export default function Dashboard() {
     );
   }
 
-  return (
-    <div className="grid gap-6">
+ return (
+  <div className="min-h-screen bg-slate-50 p-8">
+    <div className="max-w-7xl mx-auto space-y-8">
 
-      {/* Total Expenses */}
-      <Card>
-        <CardHeader>
-          <h2 className="text-lg font-semibold">
-            Total Expenses
-          </h2>
-        </CardHeader>
-        <CardContent>
-          <p className="text-3xl font-bold">
-            ₹ {data?.totalExpense || 0}
-          </p>
-        </CardContent>
-      </Card>
+      {/* Loading */}
+      {loading && (
+        <div className="text-center text-slate-400 py-16">
+          Loading dashboard...
+        </div>
+      )}
 
-      {/* Category Breakdown */}
-      <Card>
-        <CardHeader>
-          <h2 className="text-lg font-semibold">
-            Category Breakdown
-          </h2>
-        </CardHeader>
-        <CardContent>
-          {data?.categoryBreakdown?.length > 0 ? (
-            data.categoryBreakdown.map((cat) => (
-              <div
-                key={cat._id}
-                className="flex justify-between py-1"
-              >
-                <span>{cat._id}</span>
-                <span>₹ {cat.total}</span>
-              </div>
-            ))
-          ) : (
-            <p className="text-slate-500 text-sm">
-              No data available
+      {/* Error */}
+      {error && (
+        <div className="text-center text-red-500 py-10">
+          {error}
+        </div>
+      )}
+
+      {!loading && !error && (
+        <>
+          {/* Header */}
+          <div>
+            <h1 className="text-2xl font-semibold text-slate-900">
+              Dashboard
+            </h1>
+            <p className="text-sm text-slate-500 mt-1">
+              Overview of your financial activity
             </p>
-          )}
-        </CardContent>
-      </Card>
+          </div>
 
-      {/* Recent Transactions */}
-      <Card>
-        <CardHeader>
-          <h2 className="text-lg font-semibold">
-            Recent Transactions
-          </h2>
-        </CardHeader>
-        <CardContent>
-          {data?.recent?.length > 0 ? (
-            data.recent.map((t) => (
-              <div
-                key={t._id}
-                className="flex justify-between py-1 border-b last:border-none"
-              >
-                <span>{t.title}</span>
-                <span>₹ {t.amount}</span>
-              </div>
-            ))
-          ) : (
-            <p className="text-slate-500 text-sm">
-              No recent transactions
-            </p>
-          )}
-        </CardContent>
-      </Card>
+          {/* Stats Grid */}
+          <div className="grid md:grid-cols-3 gap-6">
 
+            {/* Total Expenses */}
+            <Card className="bg-white border border-slate-200 rounded-2xl shadow-sm">
+              <CardHeader className="pb-2">
+                <h2 className="text-sm font-medium text-slate-500">
+                  Total Expenses
+                </h2>
+              </CardHeader>
+              <CardContent>
+                <p className="text-4xl font-semibold text-slate-900">
+                  ₹ {data?.totalExpense || 0}
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Category Breakdown */}
+            <Card className="bg-white border border-slate-200 rounded-2xl shadow-sm">
+              <CardHeader className="pb-2">
+                <h2 className="text-sm font-medium text-slate-500">
+                  Category Breakdown
+                </h2>
+              </CardHeader>
+              <CardContent>
+                {data?.categoryBreakdown?.length > 0 ? (
+                  <div className="space-y-3">
+                    {data.categoryBreakdown.map((cat) => (
+                      <div
+                        key={cat._id}
+                        className="flex justify-between text-sm"
+                      >
+                        <span className="text-slate-700">
+                          {cat._id}
+                        </span>
+                        <span className="font-medium text-slate-900">
+                          ₹ {cat.total}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-slate-400 text-sm">
+                    No data available
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Recent Transactions */}
+            <Card className="bg-white border border-slate-200 rounded-2xl shadow-sm">
+              <CardHeader className="pb-2">
+                <h2 className="text-sm font-medium text-slate-500">
+                  Recent Transactions
+                </h2>
+              </CardHeader>
+              <CardContent>
+                {data?.recent?.length > 0 ? (
+                  <div className="space-y-3">
+                    {data.recent.map((t) => (
+                      <div
+                        key={t._id}
+                        className="flex justify-between text-sm"
+                      >
+                        <span className="text-slate-700">
+                          {t.title}
+                        </span>
+                        <span className="font-medium text-slate-900">
+                          ₹ {t.amount}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-slate-400 text-sm">
+                    No recent transactions
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+
+          </div>
+        </>
+      )}
     </div>
-  );
+  </div>
+);
+
 }
