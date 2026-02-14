@@ -5,6 +5,21 @@ const createTransaction = async (data, userId) => {
   return await Transaction.create({ ...data, user: userId });
 };
 
+const updateTransaction = async (id, data, userId) => {
+  return await Transaction.findOneAndUpdate(
+    { _id: id, user: userId },
+    data,
+    { new: true }
+  );
+};
+
+const deleteTransaction = async (id, userId) => {
+  return await Transaction.findOneAndDelete({
+    _id: id,
+    user: userId,
+  });
+};
+
 const getTransactions = async (queryParams, userId) => {
   const page = parseInt(queryParams.page) || 1;
   const limit = parseInt(queryParams.limit) || 10;
@@ -19,7 +34,17 @@ const getTransactions = async (queryParams, userId) => {
 
   const total = await Transaction.countDocuments(query);
 
-  return { transactions, total, page, pages: Math.ceil(total / limit) };
+  return {
+    transactions,
+    total,
+    page,
+    pages: Math.ceil(total / limit),
+  };
 };
 
-module.exports = { createTransaction, getTransactions };
+module.exports = {
+  createTransaction,
+  getTransactions,
+  updateTransaction,
+  deleteTransaction,
+};

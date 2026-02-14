@@ -4,7 +4,7 @@ const buildQuery = (queryParams, userId) => {
   if (queryParams.search) {
     query.title = {
       $regex: queryParams.search,
-      $options: "i"
+      $options: "i",
     };
   }
 

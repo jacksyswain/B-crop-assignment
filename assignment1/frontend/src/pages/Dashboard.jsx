@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import API from "../services/api";
 import { Card, CardHeader, CardContent } from "../components/ui/Card";
 
@@ -7,34 +7,47 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const fetchDashboard = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const res = await API.get("/dashboard");
+      setData(res.data.data);
+    } catch (err) {
+      setError("Failed to load dashboard");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        const res = await API.get("/dashboard");
-        setData(res.data.data);
-      } catch (err) {
-        setError("Failed to load dashboard");
-      } finally {
-        setLoading(false);
-      }
+    fetchDashboard();
+
+    const handleFocus = () => {
+      fetchDashboard();
     };
 
-    fetchDashboard();
-  }, []);
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [fetchDashboard]);
 
   if (loading) {
     return (
-      <p className="p-6 text-slate-500">
+      <div className="p-6 text-slate-500">
         Loading dashboard...
-      </p>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <p className="p-6 text-red-500">
+      <div className="p-6 text-red-500">
         {error}
-      </p>
+      </div>
     );
   }
 
@@ -81,7 +94,7 @@ export default function Dashboard() {
         </CardContent>
       </Card>
 
-      {/* Recent Transactions Preview */}
+      {/* Recent Transactions */}
       <Card>
         <CardHeader>
           <h2 className="text-lg font-semibold">

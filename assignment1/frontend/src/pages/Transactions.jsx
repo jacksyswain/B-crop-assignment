@@ -21,17 +21,30 @@ export default function Transactions() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [filters, setFilters] = useState({
+    category: "",
+    minAmount: "",
+    maxAmount: "",
+    startDate: "",
+    endDate: "",
+  });
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   const fetchData = async () => {
     try {
       setLoading(true);
       setError("");
 
-      const res = await API.get(
-        `/transactions?page=${page}&search=${search}`
-      );
+      const query = new URLSearchParams({
+        page,
+        search,
+        ...filters,
+      }).toString();
+
+      const res = await API.get(`/transactions?${query}`);
 
       setTransactions(res.data.data.transactions);
       setPages(res.data.data.pages);
@@ -44,20 +57,17 @@ export default function Transactions() {
 
   useEffect(() => {
     fetchData();
-  }, [page, search]);
+  }, [page, search, filters]);
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this transaction?"
-    );
-
-    if (!confirmDelete) return;
-
     try {
+      setDeletingId(id);
       await API.delete(`/transactions/${id}`);
       fetchData();
     } catch (err) {
       alert("Delete failed");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -65,50 +75,96 @@ export default function Transactions() {
     <>
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold">
-              Transaction Explorer
-            </h2>
+          <div className="flex flex-col gap-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-semibold">
+                Transaction Explorer
+              </h2>
 
-            <div className="flex gap-3">
+              <div className="flex gap-3">
+                <Input
+                  placeholder="Search..."
+                  value={search}
+                  onChange={(e) => {
+                    setPage(1);
+                    setSearch(e.target.value);
+                  }}
+                  className="w-64"
+                />
+
+                <Button
+                  onClick={() => {
+                    setEditData(null);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  + Add
+                </Button>
+              </div>
+            </div>
+
+            {/* Filters */}
+            <div className="grid grid-cols-5 gap-3">
               <Input
-                placeholder="Search transactions..."
-                value={search}
-                onChange={(e) => {
-                  setPage(1);
-                  setSearch(e.target.value);
-                }}
-                className="w-64"
+                placeholder="Category"
+                value={filters.category}
+                onChange={(e) =>
+                  setFilters({ ...filters, category: e.target.value })
+                }
               />
 
-              <Button
-                onClick={() => {
-                  setEditData(null);
-                  setIsModalOpen(true);
-                }}
-              >
-                + Add
-              </Button>
+              <Input
+                type="number"
+                placeholder="Min Amount"
+                value={filters.minAmount}
+                onChange={(e) =>
+                  setFilters({ ...filters, minAmount: e.target.value })
+                }
+              />
+
+              <Input
+                type="number"
+                placeholder="Max Amount"
+                value={filters.maxAmount}
+                onChange={(e) =>
+                  setFilters({ ...filters, maxAmount: e.target.value })
+                }
+              />
+
+              <Input
+                type="date"
+                value={filters.startDate}
+                onChange={(e) =>
+                  setFilters({ ...filters, startDate: e.target.value })
+                }
+              />
+
+              <Input
+                type="date"
+                value={filters.endDate}
+                onChange={(e) =>
+                  setFilters({ ...filters, endDate: e.target.value })
+                }
+              />
             </div>
           </div>
         </CardHeader>
 
         <CardContent>
-
           {loading && (
-            <p className="text-sm text-slate-500 mb-4">
+            <p className="text-sm text-slate-500">
               Loading transactions...
             </p>
           )}
 
           {error && (
-            <p className="text-red-500 text-sm mb-4">
+            <p className="text-red-500 text-sm">
               {error}
             </p>
           )}
 
           {!loading && transactions.length === 0 && (
-            <p className="text-slate-500 text-sm mb-4">
+            <p className="text-slate-500 text-sm">
               No transactions found.
             </p>
           )}
@@ -150,8 +206,11 @@ export default function Transactions() {
                           <Button
                             className="text-xs bg-red-500 hover:bg-red-600"
                             onClick={() => handleDelete(t._id)}
+                            disabled={deletingId === t._id}
                           >
-                            Delete
+                            {deletingId === t._id
+                              ? "Deleting..."
+                              : "Delete"}
                           </Button>
                         </div>
                       </TableCell>
@@ -160,7 +219,6 @@ export default function Transactions() {
                 </TableBody>
               </Table>
 
-              {/* Pagination */}
               <div className="flex justify-end gap-2 mt-6">
                 <Button
                   onClick={() => setPage((p) => p - 1)}
@@ -182,11 +240,9 @@ export default function Transactions() {
               </div>
             </>
           )}
-
         </CardContent>
       </Card>
 
-      {/* Add / Edit Modal */}
       <TransactionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
