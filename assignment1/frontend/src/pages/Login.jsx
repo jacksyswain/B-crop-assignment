@@ -36,56 +36,74 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-slate-50 px-4">
-      <Card className="w-full max-w-md shadow-lg">
+  <div className="min-h-screen bg-slate-50 flex items-center justify-center px-6">
+    <div className="w-full max-w-md">
 
-        <CardHeader>
-          <h2 className="text-2xl font-bold text-center">
-            Welcome Back
-          </h2>
+      <Card className="bg-white border border-slate-200 rounded-2xl shadow-sm">
+
+        <CardHeader className="text-center space-y-2 pb-4">
+          <h1 className="text-2xl font-semibold text-slate-900">
+            Welcome back
+          </h1>
+          <p className="text-sm text-slate-500">
+            Sign in to access your dashboard
+          </p>
         </CardHeader>
 
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <CardContent className="px-8 pb-8">
+          <form onSubmit={handleSubmit} className="space-y-5">
 
-            <Input
-              type="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={(e) =>
-                setForm({ ...form, email: e.target.value })
-              }
-            />
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">
+                Email Address
+              </label>
+              <Input
+                type="email"
+                placeholder="you@example.com"
+                value={form.email}
+                onChange={(e) =>
+                  setForm({ ...form, email: e.target.value })
+                }
+                className="bg-slate-50 border-slate-200"
+              />
+            </div>
 
-            <Input
-              type="password"
-              placeholder="Password"
-              value={form.password}
-              onChange={(e) =>
-                setForm({ ...form, password: e.target.value })
-              }
-            />
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">
+                Password
+              </label>
+              <Input
+                type="password"
+                placeholder="Enter your password"
+                value={form.password}
+                onChange={(e) =>
+                  setForm({ ...form, password: e.target.value })
+                }
+                className="bg-slate-50 border-slate-200"
+              />
+            </div>
 
             {error && (
-              <p className="text-red-500 text-sm">{error}</p>
+              <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-3 py-2">
+                {error}
+              </div>
             )}
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-xl py-2.5"
               disabled={loading}
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? "Signing in..." : "Sign In"}
             </Button>
 
-            {/* Register Link */}
             <p className="text-sm text-center text-slate-500">
               Don’t have an account?{" "}
               <Link
                 to="/register"
-                className="text-blue-600 hover:underline"
+                className="text-slate-900 font-medium hover:underline"
               >
-                Register
+                Create one
               </Link>
             </p>
 
@@ -93,6 +111,9 @@ export default function Login() {
         </CardContent>
 
       </Card>
+
     </div>
-  );
+  </div>
+);
+
 }
