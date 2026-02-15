@@ -7,16 +7,25 @@ const eventSchema = new mongoose.Schema(
     location: { type: String, required: true },
     dateTime: { type: Date, required: true },
     description: { type: String },
+
     capacity: { type: Number, required: true },
+    availableSeats: { type: Number, required: true },
+
     category: { type: String },
+
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User"
+      ref: "User",
+      required: true
     }
   },
   { timestamps: true }
 );
 
-eventSchema.index({ name: "text", location: "text", category: "text" });
+eventSchema.index({
+  name: "text",
+  location: "text",
+  category: "text"
+});
 
 module.exports = mongoose.model("Event", eventSchema);
